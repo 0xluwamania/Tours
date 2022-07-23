@@ -18,4 +18,4 @@ router
   .patch(updateTour)
   .delete(deleteTour);
 
-export default router;
+export default  router;

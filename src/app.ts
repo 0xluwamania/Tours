@@ -6,8 +6,8 @@ const app = express();
 
 
 
-const tourRouter = require('./routes/tourRoutes');
-const userRouter = require('./routes/userRoutes');
+import tourRouter from './routes/tours';
+import userRouter from './routes/users';
 
 
 

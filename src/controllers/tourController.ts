@@ -10,17 +10,23 @@ const fs = require('fs');
 
 
 
-export const getAllTours = (req: Request, res: Response) => {
-//   console.log(req.requestTime);
+export const getAllTours = async (req: Request, res: Response) => {
+    try {
+        const tours = await Tour.find();
+  res.status(200).json({
+    status: 'success',
+    results: tours.length,
+    data: {
+      tours
+    }
+  });
+    } catch (error) {
+        res.status(404).json({
+            status: 'failed',
+            message: error
+        })
+    }
 
-//   res.status(200).json({
-//     status: 'success',
-//     // requestedAt: req.requestTime,
-//     results: tours.length,
-//     data: {
-//       tours
-//     }
-//   });
 };
 
 export const getTour = (req: Request, res: Response) => {
@@ -37,16 +43,25 @@ export const getTour = (req: Request, res: Response) => {
 //   });
 };
 
-export const createTour = (req: Request, res: Response) => {
-  // console.log(req.body);
-  err => {
+export const createTour = async (req: Request, res: Response) => {
+    try {
+        
+        const newTour =  await Tour.create(req.body)
+  
           res.status(201).json({
             status: 'success',
-            // data: {
-            //   tour: newTour
-            // }
+            data: {
+              tour: newTour
+            }
     })
-}
+    } catch (error) {
+        res.status(400).json({
+            status: 'failed',
+            message: error
+        })
+    }
+ 
+
 }
 
 
