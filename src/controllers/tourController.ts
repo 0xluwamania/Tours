@@ -29,18 +29,23 @@ export const getAllTours = async (req: Request, res: Response) => {
 
 };
 
-export const getTour = (req: Request, res: Response) => {
-  console.log(req.params);
-  const id = Number(req.params.id);
+export const getTour = async (req: Request, res: Response) => {
+  try {
+    const tour = await Tour.findById(req.params.id)
+    res.status(200).json({
+        status: 'success',
+        data: {
+          tour
+        }
+      });
+  } catch (error) {
+    res.status(404).json({
+        status: 'failed',
+        message: error
+    })
+  }
 
-//   const tour = tours.find(el => el.id === id);
 
-//   res.status(200).json({
-//     status: 'success',
-//     data: {
-//       tour
-//     }
-//   });
 };
 
 export const createTour = async (req: Request, res: Response) => {
@@ -65,18 +70,39 @@ export const createTour = async (req: Request, res: Response) => {
 }
 
 
-export const updateTour = (req: Request, res: Response) => {
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: '<Updated tour here...>'
+export const updateTour = async (req: Request, res: Response) => {
+    try {
+        const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        })
+        res.status(200).json({
+            status: 'success',
+            data: {
+              tour
+            }
+          });
+    } catch (error) {
+        res.status(400).json({
+            status: 'failed',
+            message: error
+        })
     }
-  });
+ 
 };
 
-export const deleteTour = (req: Request, res: Response) => {
-  res.status(204).json({
-    status: 'success',
-    data: null
-  });
+export const deleteTour = async (req: Request, res: Response) => {
+    try {
+    const tour = await Tour.findByIdAndDelete(req.params.id)
+        res.status(204).json({
+            status: 'success',
+            data: tour
+          });
+    } catch (error) {
+        res.status(400).json({
+            status: 'failed',
+            message: error
+        })
+    }
+  
 };
