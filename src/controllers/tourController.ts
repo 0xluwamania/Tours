@@ -19,8 +19,13 @@ export const getAllTours = async (req: Request, res: Response) => {
         //replacing the gte field with a dollar sign so it can be used as a query in mongooose
         queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`)
 
-        const query =  Tour.find(JSON.parse(queryString));
-
+        let query =  Tour.find(JSON.parse(queryString));
+        if(req.query.sort){
+            const sortBy = Object(req.query.sort).split(' ')[0].split(',').join(' ')
+            query = query.sort(sortBy)
+        }else{
+            query = query.sort('-createdAt')
+        }
         const tours = await query;
   res.status(200).json({
     status: 'success',
