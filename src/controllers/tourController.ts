@@ -15,7 +15,11 @@ export const getAllTours = async (req: Request, res: Response) => {
        const queryObj = {...req.query};
        const excludedFields: string[] = ['page', 'sort','limit', 'fields']
        excludedFields.forEach((el)=> delete queryObj[el]);
-        const query =  Tour.find(queryObj);
+        let queryString = JSON.stringify(queryObj);
+        //replacing the gte field with a dollar sign so it can be used as a query in mongooose
+        queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`)
+
+        const query =  Tour.find(JSON.parse(queryString));
 
         const tours = await query;
   res.status(200).json({
