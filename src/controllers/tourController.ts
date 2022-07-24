@@ -128,3 +128,14 @@ export const deleteTour = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const aliasTopTours = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        req.query.limit  = '5';
+        req.query.sort = '-ratingsAverage,price';
+        req.query.field = 'name,price,ratingsAverage,summary,difficulty';
+        next();
+    } catch (error ) {
+        console.log(error)
+    }
+}
