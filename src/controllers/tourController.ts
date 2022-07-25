@@ -2,6 +2,7 @@ import path from 'path';
 import { Request, Response, NextFunction } from 'express';
 import { Tour } from '../models/tourModels';
 import APIFeatures from '../utils/apiFeatures';
+import request from 'superagent';
 
 const fs = require('fs');
 
@@ -140,7 +141,7 @@ export const getTourStats = async (req: Request, res: Response) => {
     console.log(stats);
     res.status(204).json({
       status: 'success',
-    //   data: stats,
+        data: {stats},
     });
   } catch (error) {
     res.status(400).json({
@@ -149,3 +150,46 @@ export const getTourStats = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getMonthlyPlan = async (req: Request, res: Response) => {
+    try {
+        const year = Number(req.params.year);
+        const plan = await Tour.aggregate([
+           { $unwind: '$startDates'},
+           {
+            $match: {
+                startDates: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lte: new Date(`${year}-12-31`) 
+                }
+            }   
+           },
+           {
+            $group: {
+                _id: {$month: "$startDates"},
+                numTours: {$sum: 1},
+                tours: {$push: "$name"}
+            }
+           },
+           {
+            $addFields: {month: "$_id"}
+           },
+           {
+            $project: {_id: 0}
+           },
+           {
+            $sort: {numTours: -1}
+           }
+        ])
+        // console.log(plan)
+        res.status(201).json({
+            status: 'success',
+              data: {plan},
+          });
+    } catch (error) {
+        res.status(400).json({
+            status: 'failed',
+            message: error,
+          });
+    }
+}
