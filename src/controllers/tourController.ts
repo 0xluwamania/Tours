@@ -5,8 +5,6 @@ import APIFeatures from '../utils/apiFeatures';
 
 const fs = require('fs');
 
-
-
 export const getAllTours = async (req: Request, res: Response) => {
   try {
     const features = new APIFeatures(Tour.find(), req.query)
@@ -111,6 +109,43 @@ export const aliasTopTours = async (
     req.query.field = 'name,price,ratingsAverage,summary,difficulty';
     next();
   } catch (error) {
-    console.log(error);
+    res.status(400).json({
+      status: 'failed',
+      message: error,
+    });
+  }
+};
+
+export const getTourStats = async (req: Request, res: Response) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: {$toUpper: "$difficulty"},
+          numTours: {$sum: 1},
+          numRatings: {$sum: "$ratingsQuantity"},
+          avgRating: { $avg: "$ratingsAverage" },
+          avgPrice: { $avg: "$price" },
+          minPrice: { $min: "$price" },
+          maxPrice: { $max: "$price" }
+        },
+      },
+      {
+        $sort : {avgRating: 1}
+      }
+    ]);
+    console.log(stats);
+    res.status(204).json({
+      status: 'success',
+    //   data: stats,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'failed',
+      message: error,
+    });
   }
 };

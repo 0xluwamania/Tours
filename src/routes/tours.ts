@@ -1,6 +1,6 @@
 const express = require('express');
 const tourController = require('./../controllers/tourController');
-import { getAllTours, createTour, getTour, updateTour, deleteTour, aliasTopTours } from "../controllers/tourController";
+import { getAllTours, createTour, getTour, updateTour, deleteTour, aliasTopTours, getTourStats } from "../controllers/tourController";
 import { Tour } from "../models/tourModels";
 
 const router = express.Router();
@@ -15,6 +15,10 @@ router
   router
   .route('/top-5-cheap')
   .get(aliasTopTours, getAllTours)
+
+  router
+  .route('/tour-stats')
+  .get(getTourStats)
   
 
 router
