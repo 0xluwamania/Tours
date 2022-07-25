@@ -42,6 +42,10 @@ const tourSchema = new mongoose.Schema({
         type: String,
         trim: true, 
     },
+    secretTour: {
+        type: Boolean,
+        default: false
+    },
     imageCover: {
         type: String, 
         required: [true, "A tour must have an image cover"]
@@ -65,6 +69,17 @@ tourSchema.virtual('durationWeeks').get(function(){
 
 tourSchema.pre('save', function(next){
     this.slug = slugify(this.name, {lower: true});
+    next()
+})
+let date: number = 0
+tourSchema.pre('find', function(next){
+    this.find({secretTour: {$ne: true}});
+    date = Date.now()
+    next()
+})
+
+tourSchema.post('find', function(docs, next){
+    console.log(`Query took ${Date.now() - date}`)
     next()
 })
 export const Tour = mongoose.model('Tour', tourSchema)
