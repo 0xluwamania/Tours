@@ -5,7 +5,9 @@ const tourSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, "A tour must have a name"],
-        unique: true
+        unique: true,
+        maxlength: [40, 'name length should not be more than 30'],
+        minlength: [10, 'name length should not be more than 30']
     },
     slug: String, 
     duration: {
@@ -18,11 +20,17 @@ const tourSchema = new mongoose.Schema({
     },
     difficulty: {
         type: String,
-        required: [true, 'A tour must have a group size']
+        required: [true, 'A tour must have a group size'],
+        enum: {
+            value: ['easy', 'medium', 'difficult'],
+            message: 'The value must be easy, medium or difficult'
+        }
     },
     ratingsAverage: {
         type: Number,
-        default: 4.5
+        default: 4.5,
+        min: [1, 'ratings must be above 1.0'],
+        max: [5, 'ratings must be below 5.0']
     },
     ratingsQuantity: {
         type: Number,
@@ -82,4 +90,8 @@ tourSchema.post('find', function(docs, next){
     console.log(`Query took ${Date.now() - date}`)
     next()
 })
+
+// tourSchema.pre('aggregate', function(next){
+//     next();
+// })
 export const Tour = mongoose.model('Tour', tourSchema)
