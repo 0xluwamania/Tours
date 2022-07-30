@@ -1,4 +1,5 @@
 import dotEnv from 'dotenv';
+import { Server } from 'http';
 import mongoose from 'mongoose'
 import app from './app';
 import {DB} from './env'
@@ -20,7 +21,17 @@ dotEnv.config();
     connection()
 
 const port = process.env.PORT || 3200;
-
-app.listen(port, ()=> {
+process.on('uncaughtException', (err: any)=> {
+    console.log(err, err.name)
+    process.exit(1) 
+})
+const server = app.listen(port, ()=> {
 console.log(`app is listening on PORT: ${port}...`)
+})
+
+process.on('unhandledRejection', (err: any)=> {
+    server.close(()=> {
+        console.log(err, err.name)
+        process.exit(1)
+    })
 })

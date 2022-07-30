@@ -5,7 +5,7 @@
   "main": "tsc ./lib/app.js",
   "scripts": {
     "start": "nodemon ./lib/server.js",
-    "start:prod": "NODE_ENV=production nodemon server.js",
+    "start:prod": "NODE_ENV=production nodemon ./lib/server.js",
     "debug": "ndb ./lib/server "
   },
   "author": "",
