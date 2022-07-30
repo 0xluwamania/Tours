@@ -5,7 +5,8 @@
   "main": "tsc ./lib/app.js",
   "scripts": {
     "start": "nodemon ./lib/server.js",
-    "start:prod": "NODE_ENV=production nodemon server.js"
+    "start:prod": "NODE_ENV=production nodemon server.js",
+    "debug": "ndb ./lib/server "
   },
   "author": "",
   "license": "ISC",
@@ -15,12 +16,15 @@
     "@types/mongoose": "^5.11.97",
     "@types/morgan": "^1.9.3",
     "@types/typescript": "^2.0.0",
+    "@types/validator": "^13.7.4",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "mongoose": "^6.4.6",
     "morgan": "^1.10.0",
+    "ndb": "^1.1.5",
     "slugify": "^1.6.5",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.19"

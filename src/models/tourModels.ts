@@ -1,5 +1,6 @@
-import mongoose from "mongoose"
-import slugify from "slugify"
+import mongoose from "mongoose";
+import slugify from "slugify";
+import validator from "validator"
 
 const tourSchema = new mongoose.Schema({
     name: {
@@ -7,7 +8,8 @@ const tourSchema = new mongoose.Schema({
         required: [true, "A tour must have a name"],
         unique: true,
         maxlength: [40, 'name length should not be more than 30'],
-        minlength: [10, 'name length should not be more than 30']
+        minlength: [10, 'name length should not be more than 30'],
+        // validate: [validator.isAlpha, 'Tour name must only be alphabets']
     },
     slug: String, 
     duration: {
@@ -19,12 +21,10 @@ const tourSchema = new mongoose.Schema({
         required: [true, 'A tour must have a group size']
     },
     difficulty: {
-        type: String,
+        
         required: [true, 'A tour must have a group size'],
-        enum: {
-            value: ['easy', 'medium', 'difficult'],
-            message: 'The value must be easy, medium or difficult'
-        }
+        enum:  ['easy', 'medium', 'difficult'],
+        type: String,
     },
     ratingsAverage: {
         type: Number,
@@ -40,7 +40,9 @@ const tourSchema = new mongoose.Schema({
         type: Number,
         required: [true, "A tour must have a price"]
     },
-    priceDiscount: Number,
+    priceDiscount: {
+       type: Number,
+    },
     summary: {
         type: String,
         trim: true, 
@@ -80,11 +82,11 @@ tourSchema.pre('save', function(next){
     next()
 })
 let date: number = 0
-tourSchema.pre('find', function(next){
-    this.find({secretTour: {$ne: true}});
-    date = Date.now()
-    next()
-})
+// tourSchema.pre('find', function(next){
+//     this.find({secretTour: {$ne: true}});
+//     date = Date.now()
+//     next()
+// })
 
 tourSchema.post('find', function(docs, next){
     console.log(`Query took ${Date.now() - date}`)
