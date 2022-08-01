@@ -39,3 +39,13 @@ export const login = catchAsync (async(req: Request, res: Response, next: NextFu
     })
    
 })
+
+export const auth = catchAsync (async(req: Request, res: Response, next: NextFunction)=> {
+    let token = '';
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+        token = req.headers.authorization.split(' ')[1];
+        console.log(token)
+    }
+    if(!token) return next(new AppError('Unauthorized. Please login', 401))
+    next();
+})

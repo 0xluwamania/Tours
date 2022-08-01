@@ -2,12 +2,13 @@
 import express from 'express'
 import { login, signup } from '../controllers/authController';
 import { getAllUsers, createUser, getUser, updateUser, deleteUser } from "../controllers/userController";
+import { auth } from '../controllers/authController';
 
 const router = express.Router();
 
 router
   .route('/')
-  .get(getAllUsers)
+  .get(auth, getAllUsers)
   .post(createUser);
 
 router

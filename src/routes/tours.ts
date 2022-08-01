@@ -2,6 +2,7 @@ const express = require('express');
 const tourController = require('./../controllers/tourController');
 import { getAllTours, createTour, getTour, updateTour, deleteTour, aliasTopTours, getTourStats, getMonthlyPlan } from "../controllers/tourController";
 import { Tour } from "../models/tourModels";
+import {auth} from '../controllers/authController'
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(getAllTours)
+  .get(auth, getAllTours)
   .post( createTour);
 
   router
