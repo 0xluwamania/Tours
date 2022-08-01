@@ -1,8 +1,6 @@
-import path from 'path';
 import { Request, Response, NextFunction } from 'express';
 import { Tour } from '../models/tourModels';
 import APIFeatures from '../utils/apiFeatures';
-import request from 'superagent';
 import { catchAsync } from '../utils/catchAsync';
 import AppError from '../utils/appError';
 
