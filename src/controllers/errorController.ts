@@ -20,7 +20,8 @@ const sendErrorDev = (err, res: Response)=> {
         stack: err.stack
       })
 }
-
+const handleJsonWebTokenError = () => new AppError('Invalid Token. Please Login', 401)
+const handleJsonWebTokenExpiredError = () => new AppError('Token Expired. Please Login', 401)
 const sendErrorProd = (err, res: Response)=> {
     if(err.isOperational){
         res.status(err.statusCode).json({
@@ -45,6 +46,8 @@ export const errorHandler = (err, req: Request, res: Response )=> {
     if(error.name === "CastError") error = handleCastErrorDB(error);
     if(error.code === 11000) error = handleDuplicateErrorDB(error)
     sendErrorProd(error, res)
+    if(error.name === "JsonWebTokenError") error = handleJsonWebTokenError();
+    if(error.name === "TokenExpiredError") error = handleJsonWebTokenExpiredError();
 }
     
 }

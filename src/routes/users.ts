@@ -1,8 +1,8 @@
 
 import express from 'express'
-import { login, signup } from '../controllers/authController';
-import { getAllUsers, createUser, getUser, updateUser, deleteUser } from "../controllers/userController";
-import { auth } from '../controllers/authController';
+import { login, signup, updatePassword } from '../controllers/authController';
+import { getAllUsers, createUser, getUser, updateUser, deleteUser, updateUserDetails, deleteMe } from "../controllers/userController";
+import { auth, forgotPassword, resetPassword } from '../controllers/authController';
 
 const router = express.Router();
 
@@ -18,7 +18,13 @@ router
   .delete(deleteUser);
 
 router.route('/signup').post(signup);
-router.post('/login', login)
+router.post('/login', login);
+router.post('/forgotPassword', forgotPassword);
+router.patch('/resetPassword/:token', resetPassword);
+router.post('/updatePassword', auth, updatePassword);
+router.post('/updateuserdetails', auth, updateUserDetails);
+router.post('/deleteMe', auth, deleteMe)
+
 
 
 export default router;

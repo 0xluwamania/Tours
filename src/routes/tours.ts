@@ -2,7 +2,7 @@ const express = require('express');
 const tourController = require('./../controllers/tourController');
 import { getAllTours, createTour, getTour, updateTour, deleteTour, aliasTopTours, getTourStats, getMonthlyPlan } from "../controllers/tourController";
 import { Tour } from "../models/tourModels";
-import {auth} from '../controllers/authController'
+import {auth, restrict} from '../controllers/authController'
 
 const router = express.Router();
 
@@ -30,6 +30,6 @@ router
   .route('/:id')
   .get(getTour)
   .patch(updateTour)
-  .delete(deleteTour);
+  .delete(auth, restrict('admin', 'leadGuide'), deleteTour);
 
 export default  router;

@@ -1,6 +1,22 @@
-import mongoose from 'mongoose'
+import mongoose,{Document} from 'mongoose'
 import validator from 'validator'
 import bcrypt from 'bcrypt'
+import crypto from 'crypto'
+
+interface IUser {
+ name: string,
+ email: string,
+ photo?: string,
+ password: string,
+ passwordConfirm?: string,
+ passwordChangedAt?: string,
+ 
+}
+
+export interface IUserDocument extends IUser, Document {
+	changePasswordAfter(): ()=> boolean
+}
+
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -21,11 +37,28 @@ const userSchema = new mongoose.Schema({
         required: true,
         // select: false
     },
+    role: {
+        type: String,
+        enum: ['user', 'guide', 'leadGuide', 'admin'],
+        default: 'user'
+    },
     passwordConfirm: {
-        type: String ,
+        type: String,
         // required: true`
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
     }
-})
+}, 
+{
+    toObject: {virtuals: true},
+    toJSON: {virtuals: true }
+  })
 
 userSchema.pre('save', async function(next){
     // if(!this.isModified('password')) return next;
@@ -35,6 +68,50 @@ userSchema.pre('save', async function(next){
         next()
     }
 })
+
+userSchema.pre('save', function(next){
+    if(!this.isModified('password') || this.isNew) return next();
+    this.passwordChangedAt = new Date(Date.now() - 1000);
+    next()
+})
+
+userSchema.pre('find', function(next){
+    this.find({active: {$ne: false}});
+    next()
+})
+
+userSchema.pre('findOne', function(next){
+    this.find({active: {$ne: false}});
+    next()
+})
+
+userSchema.pre('findById', function(next){
+    this.find({active: {$ne: false}});
+    next()
+})
+// userSchema.methods.changedPasswordAfter = function(JWTTimeStamp){
+//     if(this.passwordChangedAt){
+//        console.log(this.passwordChangedAt, JWTTimeStamp)
+//     }
+//     return false
+// }
+
+
+export const changedPasswordAfter = (passwordChangedAt, JWTTimeStamp) =>{
+    if(passwordChangedAt){
+        const changedTime = passwordChangedAt.getTime()/1000
+        return JWTTimeStamp < changedTime
+       console.log(changedTime, JWTTimeStamp)
+    }
+    return false
+}
+
+export const createPasswordResetToken = (user: any)=> {
+    const resetToken = crypto.randomBytes(32).toString('hex')
+    user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    return resetToken;
+}
 
 export const correctPasswordCheck = async function(candidatePassword, userPassword){
     return await bcrypt.compare(candidatePassword, userPassword)
