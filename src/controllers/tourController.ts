@@ -26,7 +26,7 @@ export const getAllTours = catchAsync(async (req: Request, res: Response, next: 
 
 export const getTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
  
-    const tour = await Tour.findById(req.params.id);
+    const tour = await Tour.findById(req.params.id).populate("reviews");
     if(!tour) return next(new AppError('No Tour with Such ID in the DB', 404))
     res.status(200).json({
       status: 'success',

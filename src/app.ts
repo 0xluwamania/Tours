@@ -14,6 +14,7 @@ import { errorHandler } from './controllers/errorController';
 
 import tourRouter from './routes/tours';
 import userRouter from './routes/users';
+import reviewRouter from './routes/reviews';
 import AppError from './utils/appError';
 
 
@@ -48,6 +49,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // 3) ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 app.all('*', (req: Request, res: Response, next: NextFunction)=> {
   // res.status(404).json({

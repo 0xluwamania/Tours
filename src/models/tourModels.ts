@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
 import validator from "validator"
+import { User } from "./userModels";
 
 const tourSchema = new mongoose.Schema({
     name: {
@@ -66,6 +67,31 @@ const tourSchema = new mongoose.Schema({
         default: Date.now(),
         select: false
     },
+    startLocation : {
+        type: {
+            type: String,
+            default: "Point",
+            enum: ["Point"]
+        },
+        coordinates: [Number],
+        address: String,
+        description: String
+    },
+    locations: [{
+        type: {
+            type: String,
+            default: "Point",
+            enum: ["Point"]
+        },
+        coordinates: [Number],
+        address: String,
+        description: String
+    }],
+    guides: Array,
+    guidesRef: [{
+        type: mongoose.Schema['ObjectId'],
+        ref: "User"
+    }],
     startDates: [Date]
 }, {
     toJSON: {virtuals: true},
@@ -75,11 +101,46 @@ const tourSchema = new mongoose.Schema({
 
 tourSchema.virtual('durationWeeks').get(function(){
     return this.duration/7
+});
+
+tourSchema.virtual('reviews', {
+    ref: "Review",
+    foreignField: "tour",
+    localField: "_id"
+})
+
+tourSchema.pre('find', function(next){
+    this.populate({
+        path: 'guidesRef',
+        select: "-__v -passwordChangedAt -role"
+    })
+    next()
+})
+
+tourSchema.pre('findOne', function(next){
+    this.populate({
+        path: 'guidesRef',
+        select: "-__v -passwordChangedAt -role"
+    })
+    next()
+})
+tourSchema.pre('findById', function(next){
+    this.populate({
+        path: 'guidesRef',
+        select: "-__v -passwordChangedAt -role"
+    })
+    next()
 })
 
 tourSchema.pre('save', function(next){
     this.slug = slugify(this.name, {lower: true});
     next()
+})
+
+tourSchema.pre('save', async function(next){
+    const guidePromises = this.guides.map(async (id)=> await User.findById(id));
+    this.guides = await Promise.all(guidePromises);
+    next;
 })
 let date: number = 0
 // tourSchema.pre('find', function(next){
