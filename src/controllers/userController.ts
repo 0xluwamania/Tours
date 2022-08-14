@@ -4,18 +4,9 @@ import {User} from '../models/userModels'
 import APIFeatures from '../utils/apiFeatures';
 import AppError from "../utils/appError";
 import { catchAsync } from '../utils/catchAsync';
+import { deleteOne, getAll, getOne, updateOne } from "./handlerFactory";
 
-export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  
-  const users = await User.find();
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users,
-    },
-  });
-  });
+export const getAllUsers = getAll(User);
 
   const filterObj = (obj, ...allowedFields)=> {
       const outputObj: any = {};
@@ -24,6 +15,11 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
       })
       return outputObj;
   }
+
+export const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  req.params.id = req['user'].id
+  next()
+})
 
   export const updateUserDetails = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
           if(req.body.password || req.body.passwordConfirm) return next(new AppError('Unauthorized', 400));
@@ -45,27 +41,12 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
       data: null
     })
   })
-  export const getUser = (req: Request, res: Response) => {
-    res.status(500).json({
-      status: 'error',
-      message: 'This route is not yet defined!'
-    });
-  };
+  export const getUser = getOne(User, undefined)
   export const createUser = (req: Request, res: Response) => {
     res.status(500).json({
       status: 'error',
       message: 'This route is not yet defined!'
     });
   };
-  export const updateUser =(req: Request, res: Response) => {
-    res.status(500).json({
-      status: 'error',
-      message: 'This route is not yet defined!'
-    });
-  };
-  export const deleteUser = (req: Request, res: Response) => {
-    res.status(500).json({
-      status: 'error',
-      message: 'This route is not yet defined!'
-    });
-  };
+  export const updateUser = updateOne(User)
+  export const deleteUser = deleteOne(User)

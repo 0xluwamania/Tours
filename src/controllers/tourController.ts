@@ -3,77 +3,19 @@ import { Tour } from '../models/tourModels';
 import APIFeatures from '../utils/apiFeatures';
 import { catchAsync } from '../utils/catchAsync';
 import AppError from '../utils/appError';
+import { createOne, deleteOne, getAll, getOne, updateOne } from './handlerFactory';
 
 const fs = require('fs');
 
-export const getAllTours = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  
-    const features = new APIFeatures(Tour.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-    const tours = await features.query;
-    res.status(200).json({
-      status: 'success',
-      results: tours.length,
-      data: {
-        tours,
-      },
-    });
- 
-});
+export const getAllTours = getAll(Tour)
 
-export const getTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
- 
-    const tour = await Tour.findById(req.params.id).populate("reviews");
-    if(!tour) return next(new AppError('No Tour with Such ID in the DB', 404))
-    res.status(200).json({
-      status: 'success',
-      data: {
-        tour,
-      },
-    });
+export const getTour = getOne(Tour, {path: 'reviews'})
 
-});
+export const createTour = createOne(Tour)
 
+export const updateTour = updateOne(Tour)
 
-
-export const createTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const newTour = await Tour.create(req.body);
-
-    res.status(201).json({
-      status: 'success',
-      data: {
-        tour: newTour,
-      },
-    });
-})
-
-export const updateTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if(!tour) return next(new AppError('No Tour with Such ID in the DB', 404))
-    res.status(200).json({
-      status: 'success',
-      data: {
-        tour,
-      },
-    });
- 
-});
-
-export const deleteTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const tour = await Tour.findByIdAndDelete(req.params.id);
-    if(!tour) return next(new AppError('No Tour with Such ID in the DB', 404))
-    res.status(204).json({
-      status: 'success',
-      data: tour,
-    });
- 
-});
+export const deleteTour = deleteOne(Tour)
 
 export const aliasTopTours = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     req.query.limit = '5';

@@ -3,8 +3,11 @@ const tourController = require('./../controllers/tourController');
 import { getAllTours, createTour, getTour, updateTour, deleteTour, aliasTopTours, getTourStats, getMonthlyPlan } from "../controllers/tourController";
 import { Tour } from "../models/tourModels";
 import {auth, restrict} from '../controllers/authController'
+import reviewRouter from './reviews';
+
 
 const router = express.Router();
+router.use('/:tourId/reviews', reviewRouter)
 
 
 
@@ -31,5 +34,7 @@ router
   .get(getTour)
   .patch(updateTour)
   .delete(auth, restrict('admin', 'leadGuide'), deleteTour);
+
+
 
 export default  router;
